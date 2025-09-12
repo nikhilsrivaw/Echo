@@ -1,4 +1,4 @@
-"use client "
+"use client"
 
 import { useOrganization } from "@clerk/nextjs"
 import { AuthLayout } from "../layouts/auth-layout"

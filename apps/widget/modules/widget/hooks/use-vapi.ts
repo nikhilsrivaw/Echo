@@ -17,7 +17,7 @@ export const useVapi = () => {
 
     useEffect(() => {
         // only for testing we are adding our keys beacuse user submit there own keys 
-        const vapiInstance = new Vapi("5e5e0d51-483d-4f8a-b318-4ef62aac6de5");
+        const vapiInstance = new Vapi("");
 
         setVapi(vapiInstance);
 
@@ -73,7 +73,7 @@ export const useVapi = () => {
         setIsConnecting(true);
         if (vapi) {
             // only for testing 
-            vapi.start("d89a3210-fb03-4a19-92eb-db0dd4e05d08");
+            vapi.start("");
         }
     }
 

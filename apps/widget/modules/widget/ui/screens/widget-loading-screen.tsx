@@ -40,7 +40,7 @@ export const WidgetLoadingScreen=({organizationId}:{organizationId : string | nu
 
         validateOrganization({organizationId}).then((result) =>{
             if(result.valid){
-                setOrganizationId("organizationId");
+                setOrganizationId(organizationId);
                 setStep("session");
             }else{
                 setErrorMessage(result.reason || "invalid configuration")

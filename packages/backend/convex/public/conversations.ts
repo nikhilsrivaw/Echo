@@ -1,6 +1,10 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { threadId } from "worker_threads";
+import { supportAgent } from "../system/ai/agent/supportAgent";
+import { saveMessage } from "@convex-dev/agent";
+import { components } from "../_generated/api";
+
   
 
 export const getOne = query({
@@ -22,7 +26,17 @@ export const getOne = query({
         const conversation = await ctx.db.get(args.conversationId);
 
         if(!conversation){
-            return null;
+            throw new ConvexError({
+                code : "NOT_FPUND",
+                message: "Conversation nto found ",
+            });
+            
+        }
+        if(conversation.contactSessionId !== session._id){
+            throw new ConvexError({
+                code : "UNAUTHORIZED",
+                message: "Incorrect session",
+            });
         }
 
         return {
@@ -50,8 +64,16 @@ export const create = mutation({
             })
 
         }
-        //TODO : replace once functionalty for thread creation is prsent 
-        const threadId = "123";
+       const {threadId} = await supportAgent.createThread(ctx , {
+        userId: args.organizationId,
+       })
+       await saveMessage(ctx , components.agent,{
+         threadId,
+         message:{
+            role:"assistant",
+            content:"Hello,how can i help You "
+         }
+       })
 
 
         const conversationId = await ctx.db.insert("conversations" , {

@@ -9,7 +9,7 @@ import { useMutation } from "convex/react";
 import {api} from "@workspace/backend/_generated/api"
 import { Doc, Id } from "@workspace/backend/_generated/dataModel"
 import { useAtomValue, useSetAtom } from "jotai";
-import { contactSessionIdAtomFamily, organizationIdAtom } from "../../atoms/widget-atoms";
+import { contactSessionIdAtomFamily, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
 
 //temproroary adding  a id 
 const organizationId = "123"
@@ -23,12 +23,14 @@ const formSchema = z.object({
 
 
 export const WidgetAuthScreen = ()=>{
+    const setScreen = useSetAtom(screenAtom);
 
     const organizationId = useAtomValue(organizationIdAtom);
     const setContactSessionId = useSetAtom(
         contactSessionIdAtomFamily(organizationId || "")
     )
     const form = useForm<z.infer<typeof formSchema>>({
+        //@ts-ignore
         resolver : zodResolver(formSchema),
         defaultValues:{
             name : "",
@@ -68,7 +70,8 @@ export const WidgetAuthScreen = ()=>{
             metadata
         });
 
-        setContactSessionId(contactSessionId )
+        setContactSessionId(contactSessionId );
+        setScreen("selection")
 
     };
 

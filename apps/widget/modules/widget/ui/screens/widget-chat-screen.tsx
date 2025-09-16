@@ -7,10 +7,15 @@ import { useForm } from "react-hook-form";
 import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react"
 import { WidgetHeader } from "../components/widget-header";
 import { Button } from "@workspace/ui/components/button";
+
 import { ArrowLeftIcon, MenuIcon } from "lucide-react";
 import { contactSessionIdAtomFamily, conversationIdAtom, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import {DicebearAvatar} from "@workspace/ui/components/dicebear-avatar"
+import {useInfiniteScroll} from "@workspace/ui/hooks/use-infinite-scroll"
+import {InfiniteScrollTrigger} from "@workspace/ui/components/infinite-scroll-trigger";
+
 import { AIConversation, AIConversationContent, AIConversationScrollButton } from "@workspace/ui/components/ai/conversation"
 import { AIInput, AIInputSubmit, AIInputTextarea, AIInputToolbar, AIInputTools } from "@workspace/ui/components/ai/input"
 import { AIMessage, AIMessageContent } from "@workspace/ui/components/ai/message"
@@ -53,7 +58,12 @@ export const WidgetChatScreen = () => {
             } : "skip",
         { initialNumItems: 10 }
     );
+    const { topElementRef , handleloadMore , canLoadMore , isLoadinMore} = useInfiniteScroll({
+        status: messages.status,
+        loadMore:messages.loadMore,
+        loadSize: 10
 
+    });
     const form = useForm<z.infer<typeof formSchema>>({
         //@ts-ignore
         resolver: zodResolver(formSchema),
@@ -100,6 +110,7 @@ export const WidgetChatScreen = () => {
             </WidgetHeader>
             <AIConversation>
                 <AIConversationContent>
+                    <InfiniteScrollTrigger canLoadMore={canLoadMore} isLoadingMore={isLoadinMore} onLoadMore={handleloadMore} ref={topElementRef}/>
                     {toUIMessages(messages.results ?? [])?.map((messages) => {
                         return (
                             <AIMessage from={messages.role === "user" ? "user" : "assistant"} key={messages.id}>
@@ -108,7 +119,9 @@ export const WidgetChatScreen = () => {
                                         {messages.content}
                                     </AIResponse>
                                 </AIMessageContent>
-                                {/* add a avatar  */}
+                                {messages.role === "assistant" && (
+                                    <DicebearAvatar imageUrl="/logo.svg" seed="assistant" size ={32}  />
+                                )}
 
                             </AIMessage>
                         )

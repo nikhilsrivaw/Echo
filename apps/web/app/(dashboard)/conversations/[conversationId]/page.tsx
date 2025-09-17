@@ -8,3 +8,5 @@ const Page =async ({params,}:{params:Promise<{ conversationId:string;}>})=>{
         
     
 }
+
+ export default Page;

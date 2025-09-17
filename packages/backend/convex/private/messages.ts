@@ -1,11 +1,55 @@
 
 import { ConvexError, v } from "convex/values";
+import {generateText} from "ai"
 import { action, mutation, query } from "../_generated/server";
 import { components, internal } from "../_generated/api";
 import { supportAgent } from "../system/ai/agent/supportAgent";
 import { paginationOptsValidator } from "convex/server";
 import { threadId } from "worker_threads";
 import { saveMessage, saveMessages } from "@convex-dev/agent";
+import { google } from "@ai-sdk/google";
+
+export const enhanceResponse = action({
+    args:{
+        prompt: v.string(),
+        
+
+    },
+    handler: async (ctx , args)=>{
+         const indentity = await ctx.auth.getUserIdentity();
+       if(indentity === null){
+        throw new ConvexError({
+            code:"UNAUTHORIZZED",
+            message:"Indentity not found"
+        })
+       }
+        const orgId = indentity.orgId as string;
+       if(!orgId){
+        throw new ConvexError({
+            code : "UNAUTHORIZZED",
+            message:"Oragnization not found"
+        })
+       }
+
+       const response = await generateText({
+        model: google("gemini-2.5-flash"),
+        messages: [
+            {
+                role:"system",
+                content:"Enhance the operators message to be more proffesional , clear , and helpful while maintaining thier intent and key information"
+            },
+            {
+                role:"user",
+                content: args.prompt
+            }
+        ]
+       });
+       return response.text
+
+
+
+    }
+})
 
 export const create =mutation({
     args:{
